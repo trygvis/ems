@@ -40,9 +40,10 @@ import java.io.InputStream;
  * @version $Revision: #5 $ $Date: 2008/09/15 $
  */
 @Produces(MIMETypes.SESSION_LIST_MIME_TYPE)
+@Path("2/events/{eventId}/sessions")
 public class SessionResource {
-    private URIBuilder uriBuilder;
-    private EmsServer emsServer;
+    private final URIBuilder uriBuilder;
+    private final EmsServer emsServer;
 
     public SessionResource(EmsServer emsServer, final URIBuilder uriBuilder) {
         this.uriBuilder = uriBuilder;
@@ -294,6 +295,4 @@ public class SessionResource {
             return builder;
         }
     };
-
-
 }

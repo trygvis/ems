@@ -15,11 +15,13 @@
 
 package no.java.ems.cli;
 
+import fj.*;
 import fj.data.Option;
 import no.java.ems.cli.command.ImportDirectory;
 import no.java.ems.client.ResourceHandle;
 import no.java.ems.external.v2.EventV2;
 import org.apache.commons.cli.Options;
+import org.codehaus.httpcache4j.*;
 
 import java.io.File;
 import java.net.URI;
@@ -58,12 +60,12 @@ public class ImportData extends AbstractCli {
             System.exit(-1);
         }
 
-        Option<EventV2> eventOption = getEms().getEvent(eventId);
+        Option<P2<EventV2, Headers>> eventOption = getEms().getEvent(eventId);
         if (eventOption.isNone()) {
             System.err.println("No such event: " + eventId);
         }
 
-        System.out.println("Importing into " + eventOption.some().getName());
+        System.out.println("Importing into " + eventOption.some()._1().getName());
 
         new ImportDirectory(getEms(), eventId, dir).run();
     }

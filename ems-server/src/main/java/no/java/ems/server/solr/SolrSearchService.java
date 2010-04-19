@@ -22,8 +22,6 @@ import no.java.ems.server.search.SearchResponse;
 import no.java.ems.server.search.SearchService;
 import no.java.ems.server.solr.ResourceToSolrTranslator;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -41,6 +39,7 @@ import org.apache.solr.core.CoreDescriptor;
 import org.apache.solr.core.SolrConfig;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.schema.IndexSchema;
+import org.slf4j.*;
 import org.xml.sax.SAXException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -64,7 +63,7 @@ public class SolrSearchService implements SearchService {
     private static final String SOLR_SCHEMA = "/solr/conf/schema.xml";
 
     private SolrServer solrServer;
-    private Log log = LogFactory.getLog(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     public SolrSearchService(EmsServerConfiguration configuration) throws Exception {

@@ -27,9 +27,8 @@ import no.java.ems.server.domain.Room;
 import no.java.ems.server.domain.Session;
 import no.java.ems.server.domain.EmsServerConfiguration;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.derby.drda.NetworkServerControl;
+import org.slf4j.*;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +51,8 @@ import java.util.List;
  */
 public class DerbyService implements InitializingBean, DisposableBean {
 
-    private Log log = LogFactory.getLog(getClass());
-    private Log derbyLog = LogFactory.getLog("Derby");
+    private Logger log = LoggerFactory.getLogger(getClass());
+    private Logger derbyLog = LoggerFactory.getLogger("Derby");
 
     private String[] TABLES = new String[]{
         "person",

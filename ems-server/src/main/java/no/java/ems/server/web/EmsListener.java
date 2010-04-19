@@ -18,20 +18,23 @@ package no.java.ems.server.web;
 import no.java.ems.server.DerbyService;
 import no.java.ems.server.domain.EmsServer;
 import no.java.ems.server.domain.EmsServerConfiguration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.*;
 import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.web.context.support.WebApplicationContextUtils.getRequiredWebApplicationContext;
 
 import javax.servlet.*;
-import java.net.URI;
+import javax.servlet.http.*;
+import java.util.*;
 
 /**
  * @author <a href="mailto:trygvis@java.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
 public class EmsListener implements ServletContextListener, ServletRequestListener {
-    private Log log = LogFactory.getLog(getClass());
+    private Logger requestLog = LoggerFactory.getLogger("log.request");
+    private Logger headerLog = LoggerFactory.getLogger("log.header");
+
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     public void contextInitialized(ServletContextEvent sce) {
         WebApplicationContext context = getRequiredWebApplicationContext(sce.getServletContext());
@@ -47,9 +50,22 @@ public class EmsListener implements ServletContextListener, ServletRequestListen
         log.warn("EmsListener.contextDestroyed");
     }
 
-    public void requestInitialized(ServletRequestEvent sre) {
+    public void requestInitialized(ServletRequestEvent event) {
+        HttpServletRequest request = (HttpServletRequest) event.getServletRequest();
+
+        requestLog.info("REQUEST: url={} contentType={}", request.getPathInfo(), request.getContentType());
+
+        Enumeration names = request.getHeaderNames();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement().toString();
+            Enumeration values = request.getHeaders(name);
+            while (values.hasMoreElements()) {
+                String value = values.nextElement().toString();
+                headerLog.info("HEADER: {}: {}", name, value);
+            }
+        }
     }
 
-    public void requestDestroyed(ServletRequestEvent sre) {
+    public void requestDestroyed(ServletRequestEvent event) {
     }
 }

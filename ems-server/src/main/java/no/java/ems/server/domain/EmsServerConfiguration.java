@@ -18,8 +18,7 @@ package no.java.ems.server.domain;
 import fj.data.Option;
 import static fj.data.Option.*;
 import org.apache.derby.jdbc.EmbeddedConnectionPoolDataSource;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.*;
 import org.springframework.beans.factory.FactoryBean;
 
 import javax.sql.DataSource;
@@ -87,7 +86,7 @@ public class EmsServerConfiguration {
     // -----------------------------------------------------------------------
 
     public final static class ConfigurationFactoryBean implements FactoryBean {
-        private Log log = LogFactory.getLog(getClass());
+        private Logger log = LoggerFactory.getLogger(getClass());
 
         private Option<File> emsHome = none();
         private Option<Integer> derbyPort = none();
