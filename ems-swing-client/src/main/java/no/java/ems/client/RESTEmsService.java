@@ -90,12 +90,9 @@ public class RESTEmsService {
         return person;
     }
 
-    public List<Event> getEvents() {
-        EventListV2 listV2 = client.getEvents();
-        Collection<Event> events = iterableList(listV2.getEvent()).
-            map(ExternalV2F.event).
-            toCollection();
-        return new ArrayList<Event>(events);
+    public fj.data.List<EventSummary> getEvents() {
+        return iterableList(client.getEvents().getEvent()).
+            map(ExternalV2F.eventSummary);
     }
 
     public Event getEvent(ResourceHandle id) {
