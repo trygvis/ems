@@ -15,10 +15,8 @@
 
 package no.java.ems.server.f;
 
-import fj.F;
-import fj.F2;
+import fj.*;
 import static fj.Function.curry;
-import fj.Unit;
 import static fj.Unit.unit;
 import fj.data.List;
 import fj.data.Option;
@@ -26,6 +24,7 @@ import static fj.data.Option.fromNull;
 import static no.java.ems.external.v2.EmsV2F.toLocalDate;
 import static no.java.ems.external.v2.EmsV2F.toXmlGregorianCalendar;
 import no.java.ems.external.v2.*;
+import no.java.ems.server.*;
 import no.java.ems.server.domain.*;
 import org.joda.time.LocalDate;
 import org.joda.time.Interval;
@@ -85,7 +84,7 @@ public class ExternalV2F {
             sessionV2.setSpeakers(new SpeakerListV2());
             sessionV2.getSpeakers().getSpeaker().addAll(List.iterableList(session.getSpeakers()).map(speakerV2).toCollection());
             sessionV2.setAttachments(new BinaryListV2());
-            sessionV2.getAttachments().getBinary().addAll(List.iterableList(session.getAttachments()).map(binaryV2).toCollection());
+            sessionV2.getAttachments().getBinary().addAll(Option.somes(List.iterableList(session.getAttachments()).map(EmsServerUtil.<Binary>fromNull_())).map(binaryV2).toCollection());
             return sessionV2;
         }
     };

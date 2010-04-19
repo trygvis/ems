@@ -15,6 +15,7 @@
 
 package no.java.ems.client.swing;
 
+import fj.*;
 import no.java.ems.client.RESTEmsService;
 import no.java.ems.client.ResourceHandle;
 import no.java.ems.domain.*;
@@ -284,18 +285,24 @@ public class Entities extends HashSet<AbstractEntity> {
 
     }
 
-    private class RefreshEventsTask extends ApplicationTask<List<Event>, Void> {
+    private class RefreshEventsTask extends ApplicationTask<Collection<Event>, Void> {
 
         public RefreshEventsTask() {
             super("no.java.ems.client.swing.Entities.refreshEventsTask");
         }
 
-        protected List<Event> doInBackground() throws Exception {
-            return EmsClient.getInstance().getClientService().getEvents();
+        protected Collection<Event> doInBackground() throws Exception {
+            final RESTEmsService service = EmsClient.getInstance().getClientService();
+            return service.
+                getEvents().map(new F<EventSummary, Event>() {
+                public Event f(EventSummary eventSummary) {
+                    return service.getEvent(eventSummary.handle);
+                }
+            }).toCollection();
         }
 
         @Override
-        protected void succeeded(final List<Event> newEvents) {
+        protected void succeeded(final Collection<Event> newEvents) {
             super.succeeded(newEvents);
             Set<Event> keep = new HashSet<Event>();
             for (Event newEvent : newEvents) {
