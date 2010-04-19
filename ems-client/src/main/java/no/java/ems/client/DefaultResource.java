@@ -15,6 +15,7 @@
 
 package no.java.ems.client;
 
+import static fj.data.Option.*;
 import org.apache.commons.lang.Validate;
 import org.codehaus.httpcache4j.Headers;
 import fj.data.Option;
@@ -45,8 +46,8 @@ public class DefaultResource implements Resource {
 
     public <T> Option<T> getData(Class<T> type) {
         if (data == null) {
-            return Option.none();
+            return none();
         }
-        return Option.some(type.cast(data));
+        return some(type.cast(data));
     }
 }

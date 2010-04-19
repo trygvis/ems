@@ -15,10 +15,11 @@
 
 package no.java.ems.external.v2;
 
+import fj.*;
+import static fj.Function.curry;
 import fj.data.Option;
 import static fj.data.Option.none;
-import fj.Unit;
-import org.codehaus.httpcache4j.MIMEType;
+import org.codehaus.httpcache4j.*;
 import org.codehaus.httpcache4j.cache.HTTPCache;
 import org.codehaus.httpcache4j.payload.Payload;
 import org.codehaus.httpcache4j.payload.InputStreamPayload;
@@ -28,6 +29,8 @@ import javax.xml.bind.*;
 import javax.xml.namespace.QName;
 import java.io.StringWriter;
 import java.io.IOException;
+import java.lang.*;
+import java.lang.Class;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
@@ -47,7 +50,6 @@ public class RESTfulEmsV2Client implements EmsV2Client {
     private final RESTfulClient client;
     private Marshaller marshaller;
     private static final MIMEType SESSION = MIMEType.valueOf(MIMETypes.SESSION_MIME_TYPE);
-    private static final MIMEType JSON = MIMEType.valueOf(MIMETypes.ENDPOINT_MIME_TYPE);
     private static final MIMEType EVENT_LIST = MIMEType.valueOf(MIMETypes.EVENT_LIST_MIME_TYPE);
     private static final MIMEType SESSION_LIST = MIMEType.valueOf(MIMETypes.SESSION_LIST_MIME_TYPE);
     private static final MIMEType EVENT = MIMEType.valueOf(MIMETypes.EVENT_MIME_TYPE);
@@ -56,7 +58,6 @@ public class RESTfulEmsV2Client implements EmsV2Client {
     private static final MIMEType ROOM_LIST = MIMEType.valueOf(MIMETypes.ROOM_LIST_MIME_TYPE);
     private static final MIMEType ROOM = MIMEType.valueOf(MIMETypes.ROOM_MIME_TYPE);
     private static final MIMEType ENDPOINT = MIMEType.valueOf(MIMETypes.ENDPOINT_MIME_TYPE);
-
 
     public RESTfulEmsV2Client(HTTPCache cache) {
         this(cache, null, null);
@@ -71,7 +72,6 @@ public class RESTfulEmsV2Client implements EmsV2Client {
             throw new RuntimeException(e);
         }
     }
-
 
     /**
      * Login. Get the endpoint and populate the endpioint map.
@@ -102,10 +102,28 @@ public class RESTfulEmsV2Client implements EmsV2Client {
         }
     }
 
+    public final F<ResourceHandle, Option<P2<EventV2, Headers>>> getEvent_ = new F<ResourceHandle, Option<P2<EventV2, Headers>>>() {
+        public Option<P2<EventV2, Headers>> f(ResourceHandle resourceHandle) {
+            return getEvent(resourceHandle);
+        }
+    };
 
-    public Option<EventV2> getEvent(ResourceHandle handle) {
-        Option<Resource> resourceOption = client.read(handle, Collections.singletonList(EVENT));
-        return extractObject(resourceOption, EventV2.class);
+    public Option<P2<EventV2, Headers>> getEvent(ResourceHandle handle) {
+        return client.read(handle, Collections.singletonList(EVENT)).
+            bind(this.<EventV2>extractObject().f(EventV2.class));
+    }
+
+    private <T> F<Class<T>, F<Resource, Option<P2<T, Headers>>>> extractObject() {
+        return curry(new F2<Class<T>, Resource, Option<P2<T, Headers>>>() {
+            public Option<P2<T, Headers>> f(Class<T> tClass, final Resource resource) {
+                return resource.getData(tClass).
+                    map(new F<T, P2<T, Headers>>() {
+                        public P2<T, Headers> f(T t) {
+                            return P.p(t, resource.getHeaders());
+                        }
+                    });
+            }
+        });
     }
 
     private <T> Option<T> extractObject(Option<Resource> resourceOption, Class<T> type) {
@@ -134,10 +152,22 @@ public class RESTfulEmsV2Client implements EmsV2Client {
         return extractObject(resourceOption, SessionListV2.class).some();
     }
 
+    public F<ResourceHandle, SessionListV2> getSessions_ = new F<ResourceHandle, SessionListV2>() {
+        public SessionListV2 f(ResourceHandle resourceHandle) {
+            return getSessions(resourceHandle);
+        }
+    };
+
     public Option<SessionV2> getSession(ResourceHandle handle) {
         Option<Resource> resourceOption = client.read(handle, Collections.singletonList(SESSION));
         return extractObject(resourceOption, SessionV2.class);
     }
+
+    public final F<ResourceHandle, Option<SessionV2>> getSession_ = new F<ResourceHandle, Option<SessionV2>>() {
+        public Option<SessionV2> f(ResourceHandle resourceHandle) {
+            return getSession(resourceHandle);
+        }
+    };
 
     public ResourceHandle addSession(ResourceHandle handle, SessionV2 session) {
         return client.create(handle, createJAXBPayload("session", SessionV2.class, session, SESSION));

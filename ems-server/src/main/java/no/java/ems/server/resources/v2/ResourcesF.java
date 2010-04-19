@@ -31,7 +31,6 @@ import org.apache.commons.lang.StringUtils;
 import java.util.Map;
 import java.util.HashMap;
 
-
 /**
  * @author <a href="mailto:trygvis@java.no">Trygve Laugst&oslash;l</a>
  * @version $Id$

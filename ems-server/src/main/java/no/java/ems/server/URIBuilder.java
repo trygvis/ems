@@ -27,9 +27,9 @@ public class URIBuilder {
         this(fromUri(baseurl));
     }
 
-    public URI baseURI() {
-        return baseurl.clone().build();
-    }
+//    public URI baseURI() {
+//        return baseurl.clone().build();
+//    }
 
     public EventsUri events() {
         return new EventsUri(baseurl.clone().segment("events"));
@@ -43,14 +43,13 @@ public class URIBuilder {
         return new PeopleUri(baseurl.clone().segment("people"));
     }
 
-    public SessionsUri sessions() {
-        return new SessionsUri(baseurl.clone().segment("events"));
-    }
+//    public SessionsUri sessions() {
+//        return new SessionsUri(baseurl.clone().segment("events"));
+//    }
 
     public RoomsUri rooms() {
         return new RoomsUri(baseurl.clone().segment("rooms"));
     }
-
 
     public URI forObject(AbstractEntity entity) {
         if (entity instanceof Session) {
@@ -107,12 +106,12 @@ public class URIBuilder {
                 this.sessions = event.clone().segment("sessions");
             }
 
-            public URI sessionList() {
+            public URI sessions() {
                 return sessions.build();
             }
 
             public String toString() {
-                return event.build().toString();
+                return get().toString();
             }
 
             public URI get() {
@@ -161,22 +160,6 @@ public class URIBuilder {
 
         public URI person(String personId) {
             return people.clone().segment(personId).build();
-        }
-    }
-
-    public static class SessionsUri {
-        private final UriBuilder builder;
-
-        private SessionsUri(UriBuilder builder) {
-            this.builder = builder;
-        }
-
-        public URI sessions(String eventid) {
-            return builder.clone().segment(eventid, "sessions").build();
-        }
-
-        public URI session(String eventid, String sessionid) {
-            return builder.clone().segment(eventid, "sessions", sessionid).build();
         }
     }
 

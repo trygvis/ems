@@ -15,6 +15,8 @@
 
 package no.java.ems.client;
 
+import fj.*;
+import static fj.data.List.iterableList;
 import no.java.ems.domain.search.ObjectType;
 import no.java.ems.domain.search.SearchResult;
 import no.java.ems.external.v2.*;
@@ -64,7 +66,7 @@ public class RESTEmsService {
 
     public List<Person> getContacts() {
         PersonListV2 people = client.getPeople();
-        Collection<Person> persons = fj.data.List.iterableList(people.getPerson()).map(ExternalV2F.person).toCollection();
+        Collection<Person> persons = iterableList(people.getPerson()).map(ExternalV2F.person).toCollection();
         return new ArrayList<Person>(persons);
     }
 
@@ -89,42 +91,44 @@ public class RESTEmsService {
     }
 
     public List<Event> getEvents() {
-        EventListV2 either = client.getEvents();
-        Collection<Event> events = fj.data.List.iterableList(either.getEvent()).map(ExternalV2F.event).toCollection();
+        EventListV2 listV2 = client.getEvents();
+        Collection<Event> events = iterableList(listV2.getEvent()).
+            map(ExternalV2F.event).
+            toCollection();
         return new ArrayList<Event>(events);
     }
 
     public Event getEvent(ResourceHandle id) {
-        Option<Event> event = client.getEvent(id)
-                .map(ExternalV2F.event);
-
-        if (event.isSome()) {
-            return event.some();
-        }
-        return null;
+        return client.getEvent(id).
+            map(ExternalV2F.eventFromRequest).
+            orSome((Event) null);
     }
 
-    public Event saveEvent(Event event) {
-        Option<EventV2> eventToSave = Option.some(event).map(ExternalV2F.eventV2);
+    public Event saveEvent(final Event event) {
+        EventV2 eventToSave = ExternalV2F.eventV2.f(event);
         ResourceHandle handle = event.getHandle();
         if (handle == null) {
-            handle = client.addEvent(eventToSave.some());
+            handle = client.addEvent(eventToSave);
         }
         else {
-            client.updateEvent(event.getHandle(), eventToSave.some());
+            client.updateEvent(event.getHandle(), eventToSave);
         }
 
-        Option<Event> option = client.getEvent(handle).map(ExternalV2F.event);
-        if (option.isSome()) {
-            event.sync(option.some());
-            return event;
-        }
-        return null;
+        Option<Event> updatedEvent = client.getEvent(handle).map(ExternalV2F.eventFromRequest);
+
+        updatedEvent.foreach(new Effect<Event>() {
+            @Override
+            public void e(Event e) {
+                event.sync(e);
+            }
+        });
+
+        return updatedEvent.orSome((Event) null);
     }
 
     public List<Session> getSessions(Event event) {
         SessionListV2 sessions = client.getSessions(new ResourceHandle(event.getSessionURI()));
-        Collection<Session> list = fj.data.List.iterableList(sessions.getSession()).map(ExternalV2F.session).toCollection();
+        Collection<Session> list = iterableList(sessions.getSession()).map(ExternalV2F.session).toCollection();
         return new ArrayList<Session>(list);
     }
 

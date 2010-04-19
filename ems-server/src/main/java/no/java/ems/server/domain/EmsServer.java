@@ -27,15 +27,9 @@ import no.java.ems.dao.BinaryDao;
 import no.java.ems.dao.EventDao;
 import no.java.ems.dao.PersonDao;
 import no.java.ems.dao.SessionDao;
-import no.java.ems.server.domain.AbstractEntity;
-import no.java.ems.server.domain.Binary;
-import no.java.ems.server.domain.Event;
-import no.java.ems.server.domain.Person;
-import no.java.ems.server.domain.Session;
 import no.java.ems.server.search.SearchService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.joda.time.LocalDate;
+import org.slf4j.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -50,7 +44,7 @@ import java.util.ArrayList;
  */
 @Component
 public class EmsServer implements InitializingBean {
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final EventDao eventDao;
     private final SessionDao sessionDao;
     private final SearchService searchService;
