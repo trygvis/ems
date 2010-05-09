@@ -191,11 +191,4 @@ public class EventResource {
             };
         };
     };
-
-    private F<EventV2, EventV2> sessionsURLV2 = new F<EventV2, EventV2>() {
-        public EventV2 f(EventV2 eventV2) {
-            eventV2.setSessionsUri(uriBuilder.sessions().sessions(eventV2.getUuid()).toString());
-            return eventV2;
-        }
-    };
 }

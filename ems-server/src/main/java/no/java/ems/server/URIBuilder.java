@@ -43,10 +43,6 @@ public class URIBuilder {
         return new PeopleUri(baseurl.clone().segment("people"));
     }
 
-//    public SessionsUri sessions() {
-//        return new SessionsUri(baseurl.clone().segment("events"));
-//    }
-
     public RoomsUri rooms() {
         return new RoomsUri(baseurl.clone().segment("rooms"));
     }
@@ -54,7 +50,7 @@ public class URIBuilder {
     public URI forObject(AbstractEntity entity) {
         if (entity instanceof Session) {
             Session session = (Session) entity;
-            return sessions().session(session.getEventId(), session.getId());
+            return events().eventUri(session.getEventId()).sessions().session(session.getId());
         }
         else if (entity instanceof Person) {
             return people().person(entity.getId());
@@ -72,7 +68,7 @@ public class URIBuilder {
             case person:
                 return people().person(id);
             case session:
-                return sessions().session(parentId, id);
+                return events().eventUri(parentId).sessions().session(id);
             default:
                 throw new IllegalArgumentException("unknown type");
         }
@@ -99,15 +95,13 @@ public class URIBuilder {
 
         public static class EventUri {
             private final UriBuilder event;
-            private final UriBuilder sessions;
 
             private EventUri(UriBuilder event) {
                 this.event = event;
-                this.sessions = event.clone().segment("sessions");
             }
 
-            public URI sessions() {
-                return sessions.build();
+            public SessionsUri sessions() {
+                return new SessionsUri(event.clone().segment("sessions"));
             }
 
             public String toString() {
@@ -116,6 +110,18 @@ public class URIBuilder {
 
             public URI get() {
                 return event.build();
+            }
+
+            public static class SessionsUri {
+                private UriBuilder sessions;
+
+                private SessionsUri(UriBuilder sessions) {
+                    this.sessions = sessions;
+                }
+
+                public URI session(String sessionId) {
+                    return sessions.clone().segment(sessionId).build();
+                }
             }
         }
     }
@@ -159,7 +165,7 @@ public class URIBuilder {
         }
 
         public URI person(String personId) {
-            return people.clone().segment(personId).build();
+            return people.segment(personId).build();
         }
     }
 
