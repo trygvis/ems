@@ -69,6 +69,8 @@ public class ExternalV2F {
             sessionV2.setEventUri(session.getEventHandle().toString());
             sessionV2.setTitle(session.getTitle());
             sessionV2.setBody(session.getBody());
+            sessionV2.setLead(session.getLead());
+            sessionV2.setOutline(session.getOutline());
             sessionV2.setNotes(session.getNotes());
             sessionV2.setEquipment(session.getEquipment());
             if (session.getLanguage() != null) {
@@ -101,6 +103,8 @@ public class ExternalV2F {
             newSession.setTitle(session.getTitle());
             newSession.setBody(session.getBody());
             newSession.setNotes(session.getNotes());
+            newSession.setLead(session.getLead());
+            newSession.setOutline(session.getOutline());
             newSession.setEquipment(session.getEquipment());
             newSession.setExpectedAudience(session.getExpectedAudience());
             newSession.setFeedback(session.getFeedback());

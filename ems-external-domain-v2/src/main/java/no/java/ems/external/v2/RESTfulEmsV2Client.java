@@ -19,6 +19,7 @@ import fj.*;
 import static fj.Function.curry;
 import fj.data.Option;
 import static fj.data.Option.none;
+import fj.Unit;
 import org.codehaus.httpcache4j.*;
 import org.codehaus.httpcache4j.cache.HTTPCache;
 import org.codehaus.httpcache4j.payload.Payload;
@@ -31,6 +32,7 @@ import java.io.StringWriter;
 import java.io.IOException;
 import java.lang.*;
 import java.lang.Class;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
@@ -169,8 +171,18 @@ public class RESTfulEmsV2Client implements EmsV2Client {
         }
     };
 
-    public ResourceHandle addSession(ResourceHandle handle, SessionV2 session) {
-        return client.create(handle, createJAXBPayload("session", SessionV2.class, session, SESSION));
+    public ResourceHandle addSession(ResourceHandle eventHandle, SessionV2 session) {
+      Option<Headers> headers = client.inspect(eventHandle);
+      if (headers.isSome()) {
+        Headers h = headers.some();
+        Header header = h.getFirstHeader("Link");
+        if (header != null) {
+          List<LinkDirective> links = HeaderUtils.toLinkDirectives(header);
+          LinkDirective link = links.get(0);
+          return client.create(new ResourceHandle(link.getURI()), createJAXBPayload("session", SessionV2.class, session, SESSION));
+        }
+      }
+      throw new IllegalArgumentException("Not possible to inspect Event found at " + session.getEventUri());
     }
 
     public Unit updateSession(ResourceHandle handle, SessionV2 session) {

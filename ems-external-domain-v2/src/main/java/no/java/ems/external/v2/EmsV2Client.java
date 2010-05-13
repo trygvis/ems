@@ -39,7 +39,7 @@ public interface EmsV2Client {
 
     Option<SessionV2> getSession(ResourceHandle handle);    
 
-    ResourceHandle addSession(ResourceHandle handle, SessionV2 session);
+    ResourceHandle addSession(ResourceHandle eventHandle, SessionV2 session);
 
     Unit updateSession(ResourceHandle handle, SessionV2 session);
 

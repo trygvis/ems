@@ -119,6 +119,10 @@ public class URIBuilder {
                     this.sessions = sessions;
                 }
 
+                public URI get() {
+                    return sessions.build();
+                }
+
                 public URI session(String sessionId) {
                     return sessions.clone().segment(sessionId).build();
                 }

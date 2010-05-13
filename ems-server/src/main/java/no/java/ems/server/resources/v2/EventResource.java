@@ -15,37 +15,23 @@
 
 package no.java.ems.server.resources.v2;
 
-import fj.F2;
-import fj.F;
-
-import static fj.Function.curry;
-
-import fj.data.Option;
-import fj.data.List;
-
-import static fj.data.Option.some;
-
+import fj.*;
+import static fj.Function.*;
+import fj.data.*;
+import static fj.data.Option.*;
 import no.java.ems.external.v2.*;
-import no.java.ems.server.URIBuilder;
+import no.java.ems.server.*;
 import no.java.ems.server.URIBuilder.*;
 import no.java.ems.server.domain.*;
-import no.java.ems.server.f.ExternalV2F;
+import no.java.ems.server.f.*;
+import static no.java.ems.server.f.ExternalV2F.*;
+import org.apache.commons.lang.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
 
-import static no.java.ems.server.f.ExternalV2F.eventV2;
-
-import org.apache.commons.lang.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.net.URI;
+import java.net.*;
 
 @Path("2/events/")
 @Component
@@ -88,6 +74,7 @@ public class EventResource {
                 map(eventRoomURLV2.f(uriBuilder.rooms())).
                 map(EmsV2F.eventJaxbElement).
                 map(curry(ResourcesF.<EventV2>singleResponseBuilderWithTagChecking(), event, request)).
+//                map(sessionsLinkHeader.f(eventId).f(eventsUri)).
                 some();
         builder = builder.header("Link", String.format("<%s>;rel=sessions", eventsUri.eventUri(eventId).sessions()));
         return builder.build();
@@ -191,4 +178,12 @@ public class EventResource {
             };
         };
     };
+
+//    private F<String, F<EventsUri, F<Response.ResponseBuilder, Response.ResponseBuilder>>> sessionsLinkHeader = curry(new F3<String, EventsUri, ResponseBuilder, ResponseBuilder>() {
+//        public Response.ResponseBuilder f(String eventId, EventsUri eventsUri, Response.ResponseBuilder responseBuilder) {
+//            LinkDirectiveBuilder directiveBuilder = LinkDirectiveBuilder.create(eventsUri.eventUri(eventId).sessions().get());
+//            responseBuilder.header("Link", directiveBuilder.build().toString());
+//            return responseBuilder;
+//        }
+//    });
 }
