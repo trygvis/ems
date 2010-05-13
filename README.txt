@@ -22,6 +22,3 @@ How to install EMS 1.1:
 The only external requirement is LDAP for storing user accounts.
 
 We have supplied a way to install EMS using a package mechanism, available in ems-pkg.
-
-
-
